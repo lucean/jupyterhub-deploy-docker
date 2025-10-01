@@ -190,3 +190,10 @@ docker run --rm \
 ```
 
 The above command creates a tarball in the `/tmp` directory on the host.
+
+```bash
+DOCKER_BUILDKIT=1 docker build \
+  --no-cache \
+  -f Dockerfile.notebook \
+  -t mynotebook:latest .
+```

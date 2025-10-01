@@ -1,0 +1,28 @@
+FROM quay.io/jupyter/minimal-notebook:python-3.11
+
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends git && \
+  rm -rf /var/lib/apt/lists/*
+
+USER ${NB_UID}
+
+RUN pip install --no-cache-dir --upgrade pip && \
+  pip install --no-cache-dir \
+  jupyterlab>=4.2 \
+  jupyterhub \
+  jupyterlab-git
+
+COPY --chown=${NB_UID}:${NB_GID} extensions /opt/extensions
+
+RUN set -eux; \
+  if [ -d /opt/extensions ]; then \
+  for d in /opt/extensions/*; do \
+  if [ -f "$d/pyproject.toml" ] || [ -f "$d/setup.py" ]; then \
+  echo "Installing extension: $d"; \
+  pip install -e "$d"; \
+  fi; \
+  done; \
+  fi
+
+CMD ["/bin/bash", "-lc", "start-notebook.py"]
+
